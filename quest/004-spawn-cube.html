@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple A-Frame Example</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+      <a-entity id="leftHand" meta-touch-controls="hand: left"></a-entity>
+      <a-entity id="rightHand" meta-touch-controls="hand: right"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const leftHand = document.getElementById("leftHand");
+        const rightHand = document.getElementById("rightHand");
+        const scene = document.querySelector("a-scene");
+
+        function spawnCube(event) {
+          const hand = event.target;
+          const position = hand.getAttribute("position");
+          const newCube = document.createElement("a-box");
+
+          newCube.setAttribute(
+            "position",
+            `${position.x} ${position.y} ${position.z}`
+          );
+          newCube.setAttribute("scale", "0.1 0.1 0.1");
+          newCube.setAttribute("color", "#FF0000");
+
+          scene.appendChild(newCube);
+          console.log(
+            `Cube spawned at: ${position.x}, ${position.y}, ${position.z}`
+          );
+        }
+
+        leftHand.addEventListener("triggerdown", spawnCube);
+        rightHand.addEventListener("triggerdown", spawnCube);
+      });
+    </script>
+  </body>
+</html>

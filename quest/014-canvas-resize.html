@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>A-Frame Hand Tracking + Canvas Animation</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+</head>
+<body>
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar" background="transparent: true">
+    <a-assets>
+      <canvas id="myCanvas" width="256" height="256"></canvas>
+    </a-assets>
+
+    <a-entity id="leftHand" hand-tracking-controls="hand: left;"></a-entity>
+    <a-entity id="rightHand" hand-tracking-controls="hand: right;"></a-entity>
+    <a-sphere id="leftIndexBall" radius="0.006" color="red"></a-sphere>
+    <a-sphere id="rightIndexBall" radius="0.006" color="blue"></a-sphere>
+
+    <a-plane id="trackedPlane" material="shader: flat; src: #myCanvas; transparent: true; color: yellow; opacity: 0.5" canvas-updater></a-plane>
+
+    <a-camera></a-camera>
+  </a-scene>
+
+  <script>
+    AFRAME.registerComponent('canvas-updater', {
+      init: function () {
+        this.canvas = document.getElementById('myCanvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.numBalls = 30;
+        this.balls = [];
+
+        for (let i = 0; i < this.numBalls; i++) {
+          this.balls.push({
+            x: Math.random() * this.canvas.width,
+            y: Math.random() * this.canvas.height,
+            radius: Math.random() * 6 + 4,
+            dx: (Math.random() - 0.5) * 3,
+            dy: (Math.random() - 0.5) * 3,
+            color: `hsl(${Math.random() * 360}, 80%, 60%)`
+          });
+        }
+      },
+
+      tick: function () {
+        let ctx = this.ctx;
+        let canvas = this.canvas;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        this.balls.forEach(ball => {
+          ctx.fillStyle = ball.color;
+          ctx.beginPath();
+          ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+          ctx.fill();
+          ball.x += ball.dx;
+          ball.y += ball.dy;
+          if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+            ball.dx *= -1;
+          }
+          if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+            ball.dy *= -1;
+          }
+        });
+
+        let material = this.el.getObject3D('mesh').material;
+        if (material.map) {
+          material.map.needsUpdate = true;
+        }
+      }
+    });
+
+    AFRAME.registerComponent('hand-tracking-listener', {
+      init: function () {
+        this.leftHand = document.getElementById('leftHand');
+        this.rightHand = document.getElementById('rightHand');
+        this.leftBall = document.getElementById('leftIndexBall');
+        this.rightBall = document.getElementById('rightIndexBall');
+        this.plane = document.getElementById('trackedPlane');
+
+        this.thresholdY = 1.2;
+      },
+
+      tick: function () {
+        let leftHandObj = this.leftHand.object3D;
+        let rightHandObj = this.rightHand.object3D;
+
+        if (leftHandObj && rightHandObj) {
+          let leftIndex = leftHandObj.children[0]?.children[19];
+          let rightIndex = rightHandObj.children[0]?.children[10];
+
+          if (leftIndex && rightIndex) {
+            let leftPos = leftIndex.position;
+            let rightPos = rightIndex.position;
+            this.leftBall.object3D.position.set(leftPos.x, leftPos.y, leftPos.z);
+            this.rightBall.object3D.position.set(rightPos.x, rightPos.y, rightPos.z);
+
+            let centerX = (leftPos.x + rightPos.x) / 2;
+            let centerY = (leftPos.y + rightPos.y) / 2;
+            let centerZ = (leftPos.z + rightPos.z) / 2;
+
+            let width = Math.abs(rightPos.x - leftPos.x);
+            let height = Math.abs(rightPos.y - leftPos.y);
+
+            if (leftPos.y < this.thresholdY && rightPos.y < this.thresholdY) {
+              this.plane.object3D.rotation.set(-Math.PI / 2, 0, 0); // X軸回転
+              this.plane.object3D.scale.set(width, Math.abs(rightPos.z - leftPos.z), 1);
+            } else {
+              this.plane.object3D.rotation.set(0, 0, 0);
+              this.plane.object3D.scale.set(width, height, 1);
+            }
+
+            this.plane.object3D.position.set(centerX, centerY, centerZ);
+          }
+        }
+      }
+    });
+
+    document.querySelector('a-scene').setAttribute('hand-tracking-listener', '');
+  </script>
+</body>
+</html>

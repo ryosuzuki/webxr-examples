@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>A-Frame Laser Spawn</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@c-frame/aframe-physics-system@4.2.2/dist/aframe-physics-system.min.js"></script>
+</head>
+<body>
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar" physics="gravity: -9.8; debug: true">
+    <a-plane static-body position="0 0 0" rotation="-90 0 0" width="10" height="10" color="#7BC8A4"></a-plane>
+    <a-camera></a-camera>
+    <a-entity id="leftHand" oculus-touch-controls="hand: left"></a-entity>
+    <a-entity id="rightHand"
+              oculus-touch-controls="hand: right"
+              laser-controls
+              raycaster="objects: a-plane; showLine: true">
+    </a-entity>
+  </a-scene>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const scene = document.querySelector("a-scene");
+      const rightHand = document.getElementById("rightHand");
+
+      function spawnCube(event) {
+        const intersection = event.detail.intersection;
+        if (!intersection) return;
+
+        const position = intersection.point;
+        const newCube = document.createElement("a-box");
+        newCube.setAttribute("position", `${position.x} ${position.y + 0.05} ${position.z}`);
+        newCube.setAttribute("scale", "0.1 0.1 0.1");
+        newCube.setAttribute("color", "#FF0000");
+        newCube.setAttribute("dynamic-body", "");
+
+        scene.appendChild(newCube);
+        console.log(`Cube spawned at: ${position.x}, ${position.y}, ${position.z}`);
+      }
+
+      rightHand.addEventListener("click", spawnCube);
+    });
+  </script>
+</body>
+</html>

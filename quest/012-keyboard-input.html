@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>A-Frame Quest Text Input with Controllers</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script>
+    AFRAME.registerComponent('keyboard-input', {
+      schema: { target: { type: 'selector' } },
+      init: function () {
+        const el = this.el;
+        const textEl = this.data.target;
+
+        this.textInput = document.createElement('input');
+        this.textInput.type = 'text';
+        this.textInput.style.position = 'absolute';
+        this.textInput.style.opacity = 0;
+        document.body.appendChild(this.textInput);
+
+        this.textInput.addEventListener('input', (e) => {
+          if (textEl) textEl.setAttribute('text', 'value', e.target.value);
+        });
+
+        el.addEventListener('click', () => {
+          const session = el.sceneEl.xrSession;
+          if (session && session.isSystemKeyboardSupported) {
+            this.textInput.focus();
+          }
+        });
+
+        this.el.sceneEl.addEventListener('exit-vr', () => {
+          this.textInput.blur();
+          this.textInput.remove();
+        });
+      }
+    });
+  </script>
+</head>
+<body>
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+    <a-entity oculus-touch-controls="hand: left" laser-controls raycaster="objects: .clickable"></a-entity>
+    <a-entity oculus-touch-controls="hand: right" laser-controls raycaster="objects: .clickable"></a-entity>
+
+    <a-camera></a-camera>
+    <a-plane id="textbox" class="clickable" keyboard-input="target: #textDisplay"
+             position="0 1.5 -2" width="1.5" height="0.3" color="white">
+    </a-plane>
+    <a-text id="textDisplay" text="value: Tap to enter text; color: black; width: 1.4; align: center"
+            position="0 1.5 -1.99">
+    </a-text>
+  </a-scene>
+</body>
+</html>

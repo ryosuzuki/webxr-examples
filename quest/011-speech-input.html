@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple A-Frame Voice Input</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+</head>
+<body>
+  <button id="startButton" style="position: fixed; top: 10px; left: 10px; z-index: 100;">Start Voice Input</button>
+  <button id="stopButton" style="position: fixed; top: 50px; left: 10px; z-index: 100;">Stop Voice Input</button>
+
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+    <a-entity oculus-touch-controls="hand: left"></a-entity>
+    <a-entity oculus-touch-controls="hand: right"></a-entity>
+    <a-camera></a-camera>
+    <a-text id="text3D" value="Listening..." color="gray" position="0 1.6 -2" scale="1.5 1.5 1.5"></a-text>
+  </a-scene>
+
+  <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let interimText = "";
+      let finalText = "";
+
+      for (let i = 0; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalText += event.results[i][0].transcript + " ";
+        } else {
+          interimText += event.results[i][0].transcript + " ";
+        }
+      }
+
+      document.getElementById('text3D').setAttribute('value', interimText || finalText);
+    };
+
+    recognition.onerror = (event) => {
+      console.error("Speech Recognition Error:", event.error);
+    };
+
+    document.getElementById('startButton').addEventListener('click', () => {
+      recognition.start();
+    });
+
+    document.getElementById('stopButton').addEventListener('click', () => {
+      recognition.stop();
+    });
+  </script>
+</body>
+</html>

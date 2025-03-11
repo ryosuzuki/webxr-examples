@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple A-Frame Text Input</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+</head>
+<body>
+  <input id="textInput" type="text" placeholder="Enter text" style="position: fixed; top: 10px; left: 10px; z-index: 100;">
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+    <a-entity oculus-touch-controls="hand: left"></a-entity>
+    <a-entity oculus-touch-controls="hand: right"></a-entity>
+    <a-camera></a-camera>
+    <a-text id="text3D" value="Hello" color="gray" position="0 1.6 -2" scale="1.5 1.5 1.5"></a-text>
+  </a-scene>
+
+  <script>
+    document.getElementById('textInput').addEventListener('input', (event) => {
+      document.getElementById('text3D').setAttribute('value', event.target.value);
+    });
+  </script>
+</body>
+</html>

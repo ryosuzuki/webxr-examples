@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple A-Frame Grabbable</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene grab-handler xr-mode-ui="enabled: true; XRMode: ar">
+      <a-entity id="leftHand" meta-touch-controls="hand: left"></a-entity>
+      <a-entity id="rightHand" meta-touch-controls="hand: right"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      const leftHand = document.getElementById("leftHand");
+      const rightHand = document.getElementById("rightHand");
+      const scene = document.querySelector("a-scene");
+      let grabbedCube = null;
+      let grabbedHand = null;
+
+      AFRAME.registerComponent("grab-handler", {
+        tick: function () {
+          if (grabbedCube && grabbedHand) {
+            const handPosition = new THREE.Vector3();
+            grabbedHand.object3D.getWorldPosition(handPosition);
+            grabbedCube.setAttribute(
+              "position",
+              `${handPosition.x} ${handPosition.y} ${handPosition.z}`
+            );
+          }
+        }
+      });
+
+      document.addEventListener("DOMContentLoaded", function () {
+        leftHand.addEventListener("triggerdown", grabCube);
+        rightHand.addEventListener("triggerdown", grabCube);
+
+        leftHand.addEventListener("triggerup", releaseCube);
+        rightHand.addEventListener("triggerup", releaseCube);
+      });
+
+      function grabCube(event) {
+        if (grabbedCube) return;
+
+        const hand = event.target;
+        const intersectedCube = checkIntersection(hand);
+
+        if (intersectedCube) {
+          grabbedCube = intersectedCube;
+          grabbedHand = hand;
+          console.log("Grabbed Cube!");
+        } else {
+          spawnCube(event);
+        }
+      }
+
+      function releaseCube() {
+        if (grabbedCube) {
+          console.log("Released Cube!");
+          grabbedCube = null;
+        }
+      }
+
+      function spawnCube(event) {
+        const hand = event.target;
+        const handPosition = new THREE.Vector3();
+        hand.object3D.getWorldPosition(handPosition);
+
+        const newCube = document.createElement("a-box");
+        newCube.setAttribute(
+          "position",
+          `${handPosition.x} ${handPosition.y} ${handPosition.z}`
+        );
+        newCube.setAttribute("scale", "0.1 0.1 0.1");
+        newCube.setAttribute("color", "#FF0000");
+        newCube.setAttribute("class", "interactable");
+
+        scene.appendChild(newCube);
+        console.log(
+          `Cube spawned at: ${handPosition.x}, ${handPosition.y}, ${handPosition.z}`
+        );
+      }
+
+      function checkIntersection(hand) {
+        const handPosition = new THREE.Vector3();
+        hand.object3D.getWorldPosition(handPosition);
+        const cubes = document.querySelectorAll(".interactable");
+
+        for (let cube of cubes) {
+          const cubePosition = new THREE.Vector3();
+          cube.object3D.getWorldPosition(cubePosition);
+          if (handPosition.distanceTo(cubePosition) < 0.2) {
+            return cube;
+          }
+        }
+        return null;
+      }
+
+      function moveCube(event) {
+        if (grabbedCube) {
+          const hand = event.target;
+          const handPosition = new THREE.Vector3();
+          hand.object3D.getWorldPosition(handPosition);
+          grabbedCube.setAttribute(
+            "position",
+            `${handPosition.x} ${handPosition.y} ${handPosition.z}`
+          );
+        }
+      }
+    </script>
+  </body>
+</html>

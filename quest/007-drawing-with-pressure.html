@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame VR Drawing</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene draw-handler xr-mode-ui="enabled: true; XRMode: ar">
+      <a-entity id="leftHand" meta-touch-controls="hand: left"></a-entity>
+      <a-entity id="rightHand" meta-touch-controls="hand: right"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      const leftHand = document.getElementById("leftHand");
+      const rightHand = document.getElementById("rightHand");
+      const scene = document.querySelector("a-scene");
+      let isDrawing = false;
+      let lastPoint = new THREE.Vector3();
+      let lastThickness = 0;
+      let pressure = 0;
+      let currentStrokeEl = null;
+
+      AFRAME.registerComponent("draw-handler", {
+        tick: function () {
+          if (isDrawing && currentStrokeEl) {
+            const handPosition = new THREE.Vector3();
+            rightHand.object3D.getWorldPosition(handPosition);
+
+            if (lastPoint.distanceTo(handPosition) > 0.01) {
+              drawSegment(lastPoint, handPosition, lastThickness, pressure);
+              lastPoint.copy(handPosition);
+              lastThickness = pressure;
+            }
+          }
+        }
+      });
+
+      rightHand.addEventListener("triggerdown", startDrawing);
+      rightHand.addEventListener("triggerup", stopDrawing);
+      rightHand.addEventListener("triggerchanged", (e) => {
+        pressure = e.detail.value;
+      });
+
+      function startDrawing(event) {
+        isDrawing = true;
+        currentStrokeEl = document.createElement("a-entity");
+        scene.appendChild(currentStrokeEl);
+        rightHand.object3D.getWorldPosition(lastPoint);
+        if (pressure === 0) { pressure = 1; }
+        lastThickness = pressure;
+      }
+
+      function stopDrawing() {
+        isDrawing = false;
+        currentStrokeEl = null;
+      }
+
+      function drawSegment(pointA, pointB, thicknessA, thicknessB) {
+        const segment = document.createElement("a-entity");
+        const midPoint = new THREE.Vector3().addVectors(pointA, pointB).multiplyScalar(0.5);
+        const dirVec = new THREE.Vector3().subVectors(pointB, pointA);
+        const segLength = dirVec.length();
+
+        if (segLength <= 0) return;
+        const avgPressure = (thicknessA + thicknessB) / 2;
+        const radius = 0.005 + 0.045 * avgPressure;
+
+        segment.setAttribute("geometry", `primitive: cylinder; radius: ${radius}; height: ${segLength}`);
+        segment.setAttribute("material", "shader: flat; color: #FF0000; side: double");
+        segment.object3D.position.copy(midPoint);
+
+        const up = new THREE.Vector3(0, 1, 0);
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(up, dirVec.clone().normalize());
+        segment.object3D.quaternion.copy(quaternion);
+
+        if (currentStrokeEl) {
+          currentStrokeEl.appendChild(segment);
+        } else {
+          scene.appendChild(segment);
+        }
+      }
+    </script>
+  </body>
+</html>

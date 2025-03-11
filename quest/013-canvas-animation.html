@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame Passthrough + Canvas Animation</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar" background="transparent: true">
+      <a-assets>
+        <canvas id="myCanvas" width="256" height="256"></canvas>
+      </a-assets>
+
+      <a-plane position="0 1.5 -2" material="shader: flat; src: #myCanvas; transparent: true" canvas-updater></a-plane>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      AFRAME.registerComponent('canvas-updater', {
+        init: function () {
+          this.canvas = document.getElementById('myCanvas');
+          this.ctx = this.canvas.getContext('2d');
+          this.numBalls = 30;
+          this.balls = [];
+
+          for (let i = 0; i < this.numBalls; i++) {
+            this.balls.push({
+              x: Math.random() * this.canvas.width,
+              y: Math.random() * this.canvas.height,
+              radius: Math.random() * 6 + 4,
+              dx: (Math.random() - 0.5) * 3,
+              dy: (Math.random() - 0.5) * 3,
+              color: `hsl(${Math.random() * 360}, 80%, 60%)`
+            });
+          }
+        },
+
+        tick: function () {
+          let ctx = this.ctx;
+          let canvas = this.canvas;
+
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          this.balls.forEach(ball => {
+            ctx.fillStyle = ball.color;
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+            if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+              ball.dx *= -1;
+            }
+            if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+              ball.dy *= -1;
+            }
+          });
+
+          let material = this.el.getObject3D('mesh').material;
+          if (material.map) {
+            material.map.needsUpdate = true;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

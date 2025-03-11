@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple A-Frame Grabbable</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+      <a-box
+        grabbable
+        position="0 1 -0.3"
+        scale="0.1 0.1 0.1"
+        rotation="0 45 0"
+        color="#4CC3D9"
+      ></a-box>
+      <a-entity oculus-touch-controls="hand: left"></a-entity>
+      <a-entity oculus-touch-controls="hand: right"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+  </body>
+</html>

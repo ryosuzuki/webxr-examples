@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>A-Frame Video Raycast</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+</head>
+<body>
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+    <a-assets>
+      <video id="video" src="https://cdn.glitch.global/9903df9d-c216-42c7-b9fa-394ae4add69f/mov_bbb.mp4?v=1741732576571"
+             preload="auto" loop crossorigin="anonymous" playsinline></video>
+    </a-assets>
+    <a-entity id="rightHand"
+              oculus-touch-controls="hand: right"
+              laser-controls
+              raycaster="objects: .clickable; showLine: true">
+    </a-entity>
+    <a-video id="videoScreen" src="#video" position="0 1.2 -1" width="1" height="0.5" class="clickable"></a-video>
+  </a-scene>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const video = document.getElementById("video");
+      const rightHand = document.getElementById("rightHand");
+
+      rightHand.addEventListener("click", function (event) {
+        const intersection = event.detail.intersection;
+        if (!intersection) return;
+
+        const clickedObject = intersection.object.el;
+        if (clickedObject && clickedObject.id === "videoScreen") {
+          if (video.paused) {
+            video.play().catch(e => console.log("Playback error: ", e));
+          } else {
+            video.pause();
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

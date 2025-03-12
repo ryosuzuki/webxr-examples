@@ -1,0 +1,24 @@
+<!--
+How to Enable Real World Mesh In Quest 3
+- Open Quick Settings > Settings > Environmental Setup > Space Setup
+- Scan Your Room
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Passthrough</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene
+      xr-mode-ui="enabled: true; XRMode: ar"
+      webxr="optionalFeatures: [plane-detection, mesh-detection, hand-tracking]"
+      background="transparent: true"
+      real-world-meshing
+    >
+      <a-camera></a-camera>
+    </a-scene>
+  </body>
+</html>

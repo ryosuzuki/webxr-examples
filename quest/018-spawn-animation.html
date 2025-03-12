@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Simple A-Frame Example</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+      <a-entity id="leftHand" meta-touch-controls="hand: left"></a-entity>
+      <a-entity id="rightHand" meta-touch-controls="hand: right"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const leftHand = document.getElementById("leftHand");
+        const rightHand = document.getElementById("rightHand");
+        const scene = document.querySelector("a-scene");
+
+        function spawnCube(event) {
+          const hand = event.target;
+          const position = hand.getAttribute("position");
+          const newCube = document.createElement("a-box");
+
+          newCube.setAttribute(
+            "position",
+            `${position.x} ${position.y} ${position.z}`
+          );
+          newCube.setAttribute("scale", "0.1 0.1 0.1");
+          newCube.setAttribute("color", "#FF0000");
+          newCube.setAttribute("animation", "property: material.color; to: #0000FF; dur: 1000; loop: true; dir: alternate");
+          newCube.setAttribute("animation__position", `property: position; from: ${position.x} ${position.y} ${position.z}; to: ${position.x} ${position.y + 0.1} ${position.z}; dir: alternate; dur: 500; loop: true; easing: easeInOutSine`);
+
+          scene.appendChild(newCube);
+          console.log(
+            `Cube spawned at: ${position.x}, ${position.y}, ${position.z}`
+          );
+        }
+
+        leftHand.addEventListener("triggerdown", spawnCube);
+        rightHand.addEventListener("triggerdown", spawnCube);
+      });
+    </script>
+  </body>
+</html>

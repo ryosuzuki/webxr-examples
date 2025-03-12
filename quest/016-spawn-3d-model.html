@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>A-Frame Tree Spawn</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@c-frame/aframe-physics-system@4.2.2/dist/aframe-physics-system.min.js"></script>
+</head>
+<body>
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+    <a-plane position="0 0 0" rotation="-90 0 0" width="5" height="5" color="#7BC8A4"></a-plane>
+    <a-camera></a-camera>
+    <a-assets>
+      <a-asset-item id="treeModel" src="https://cdn.glitch.global/52eae4f7-4ab7-4502-92fd-d4e1f1b8fd72/tree.glb?v=1642537665424"></a-asset-item>
+    </a-assets>
+    <a-entity id="leftHand" oculus-touch-controls="hand: left"></a-entity>
+    <a-entity id="rightHand"
+              oculus-touch-controls="hand: right"
+              laser-controls
+              raycaster="objects: a-plane; showLine: true">
+    </a-entity>
+  </a-scene>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const scene = document.querySelector("a-scene");
+      const rightHand = document.getElementById("rightHand");
+
+      function spawnTree(event) {
+        const intersection = event.detail.intersection;
+        if (!intersection) return;
+
+        const position = intersection.point;
+        const newTree = document.createElement("a-entity");
+        newTree.setAttribute("position", `${position.x} ${position.y} ${position.z}`);
+        newTree.setAttribute("gltf-model", "#treeModel");
+        newTree.setAttribute("scale", "0.1 0.1 0.1");
+        scene.appendChild(newTree);
+
+        newTree.addEventListener("model-loaded", () => {
+          newTree.setAttribute("animation", {
+            property: "scale",
+            to: "3 3 3",
+            easing: "easeOutElastic",
+            dur: 800
+          });
+        });
+
+        console.log(`Tree spawned at: ${position.x}, ${position.y}, ${position.z}`);
+      }
+
+      rightHand.addEventListener("click", spawnTree);
+    });
+  </script>
+</body>
+</html>

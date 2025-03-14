@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame VR Drawing</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene draw-handler xr-mode-ui="enabled: true; XRMode: ar">
+      <a-assets>
+        <canvas id="colorCanvas" width="256" height="256"></canvas>
+        <canvas id="sizeCanvas" width="256" height="50"></canvas>
+      </a-assets>
+      <a-plane
+        position="-0.5 1.5 -2"
+        width="1"
+        height="1"
+        material="shader: flat; src: #colorCanvas; transparent: true"
+        interaction-handler
+      ></a-plane>
+      <a-plane
+        position="0.5 1.5 -2"
+        width="1"
+        height="0.2"
+        material="shader: flat; src: #sizeCanvas; transparent: true"
+        interaction-handler
+      ></a-plane>
+
+      <a-entity id="leftHand" meta-touch-controls="hand: left"></a-entity>
+      <a-entity
+        id="rightHand"
+        meta-touch-controls="hand: right"
+        laser-controls
+        raycaster="objects: *"
+      ></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      const leftHand = document.getElementById("leftHand");
+      const rightHand = document.getElementById("rightHand");
+      const scene = document.querySelector("a-scene");
+      let isDrawing = false;
+      let lastPoint = new THREE.Vector3();
+      let currentStrokeEl = null;
+
+      let selectedColor = "black";
+      let penSize = 5;
+      let changed = false;
+
+      AFRAME.registerComponent("draw-handler", {
+        tick: function () {
+          if (isDrawing && currentStrokeEl) {
+            const handPosition = new THREE.Vector3();
+            rightHand.object3D.getWorldPosition(handPosition);
+
+            if (lastPoint.distanceTo(handPosition) > 0.01) {
+              drawSegment(lastPoint, handPosition);
+              lastPoint.copy(handPosition);
+            }
+          }
+        },
+      });
+
+      rightHand.addEventListener("triggerdown", startDrawing);
+      rightHand.addEventListener("triggerup", stopDrawing);
+
+      function startDrawing(event) {
+        isDrawing = true;
+        currentStrokeEl = document.createElement("a-entity");
+        scene.appendChild(currentStrokeEl);
+        rightHand.object3D.getWorldPosition(lastPoint);
+      }
+
+      function stopDrawing() {
+        isDrawing = false;
+        currentStrokeEl = null;
+      }
+
+      function drawSegment(pointA, pointB) {
+        const segment = document.createElement("a-entity");
+        const midPoint = new THREE.Vector3()
+          .addVectors(pointA, pointB)
+          .multiplyScalar(0.5);
+        const dirVec = new THREE.Vector3().subVectors(pointB, pointA);
+        const segLength = dirVec.length();
+
+        segment.setAttribute(
+          "geometry",
+          `primitive: cylinder; radius: ${
+            penSize * 0.002
+          }; height: ${segLength}`
+        );
+        segment.setAttribute(
+          "material",
+          `shader: flat; color: ${selectedColor}; side: double`
+        );
+        segment.object3D.position.copy(midPoint);
+
+        const up = new THREE.Vector3(0, 1, 0);
+        const quaternion = new THREE.Quaternion().setFromUnitVectors(
+          up,
+          dirVec.clone().normalize()
+        );
+        segment.object3D.quaternion.copy(quaternion);
+
+        if (currentStrokeEl) {
+          currentStrokeEl.appendChild(segment);
+        } else {
+          scene.appendChild(segment);
+        }
+      }
+
+      AFRAME.registerComponent("interaction-handler", {
+        init: function () {
+          this.el.addEventListener("click", (event) => {
+            console.log(event);
+            const intersection = event.detail.intersection;
+            if (!intersection) return;
+            const uv = intersection.uv;
+
+            if (this.el.getAttribute("material").src.id === "colorCanvas") {
+              pickColor(uv.x, uv.y);
+            } else if (
+              this.el.getAttribute("material").src.id === "sizeCanvas"
+            ) {
+              pickSize(uv.x);
+            }
+          });
+          drawColorPicker();
+          drawSizeSelector();
+        },
+
+        tick: function () {
+          let material = this.el.getObject3D("mesh").material;
+          if (material.map) {
+            material.map.needsUpdate = true;
+          }
+        },
+      });
+
+      function pickColor(x, y) {
+        const ctx = document.getElementById("colorCanvas").getContext("2d");
+        const pixel = ctx.getImageData(x * 256, y * 256, 1, 1).data;
+        selectedColor = `rgb(${pixel[0]}, ${pixel[1]}, ${pixel[2]})`;
+        drawColorPicker();
+        console.log(`Pick color: ${selectedColor}`);
+      }
+
+      function drawColorPicker() {
+        const canvas = document.getElementById("colorCanvas");
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (let y = 0; y < canvas.height; y++) {
+          for (let x = 0; x < canvas.width; x++) {
+            const dx = x - canvas.width / 2;
+            const dy = y - canvas.height / 2;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance <= canvas.width / 2) {
+              const angle = Math.atan2(dy, dx) + Math.PI;
+              const hue = (angle / (2 * Math.PI)) * 360;
+              const saturation = (distance / (canvas.width / 2)) * 100;
+              ctx.fillStyle = `hsl(${hue}, ${saturation}%, 50%)`;
+              ctx.fillRect(x, y, 1, 1);
+            }
+          }
+        }
+
+        const circleSize = 10;
+        const circleX = canvas.width / 2;
+        const circleY = canvas.height / 2;
+        ctx.fillStyle = selectedColor;
+        ctx.beginPath();
+        ctx.arc(circleX, circleY, circleSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function pickSize(x) {
+        penSize = Math.max(1, Math.min(20, Math.round(x * 19) + 1));
+        drawSizeSelector();
+        console.log(`Pick thickness: ${penSize}`);
+      }
+
+      function drawSizeSelector() {
+        const canvas = document.getElementById("sizeCanvas");
+        const ctx = canvas.getContext("2d");
+        let sliderX = 10 + (penSize - 1) * ((canvas.width - 20) / 19);
+        console.log(sliderX);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "gray";
+        ctx.fillRect(10, 20, canvas.width - 20, 10);
+        ctx.fillStyle = "black";
+        ctx.beginPath();
+        ctx.arc(sliderX, 25, 8, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    </script>
+  </body>
+</html>

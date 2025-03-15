@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame + D3.js</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar" background="transparent: true">
+      <a-assets>
+        <canvas id="canvas" width="256" height="256"></canvas>
+      </a-assets>
+      <a-plane position="0 1.5 -2" material="src: #canvas; transparent: true" canvas-updater></a-plane>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      AFRAME.registerComponent("canvas-updater", {
+        init: function () {
+          this.canvas = document.getElementById("canvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.updateCanvas();
+        },
+        updateCanvas: function () {
+          const ctx = this.ctx;
+          const canvas = this.canvas;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          const data = [3, 7, 1, 9, 4, 6];
+          const xScale = d3.scaleBand()
+            .domain(d3.range(data.length))
+            .range([20, canvas.width - 20])
+            .padding(0.1);
+          const yScale = d3.scaleLinear()
+            .domain([0, d3.max(data)])
+            .range([canvas.height - 20, 20]);
+          data.forEach((d, i) => {
+            ctx.fillStyle = d3.interpolateCool(d / 10);
+            ctx.fillRect(
+              xScale(i),
+              yScale(d),
+              xScale.bandwidth(),
+              canvas.height - yScale(d) - 20
+            );
+          });
+
+          let material = this.el.getObject3D("mesh").material;
+          if (material.map) {
+            material.map.needsUpdate = true;
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

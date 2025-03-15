@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame + D3.js Interactive</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar" background="transparent: true">
+      <a-assets>
+        <canvas id="canvas" width="256" height="256"></canvas>
+      </a-assets>
+      <a-plane position="0 1.5 -2" material="src: #canvas; transparent: true" canvas-updater></a-plane>
+      <a-entity id="rightHand" meta-touch-controls="hand: right"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      AFRAME.registerComponent("canvas-updater", {
+        init: function () {
+          this.canvas = document.getElementById("canvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.data = this.generateRandomData();
+          this.targetData = [...this.data];
+          this.updateCanvas(this.data);
+          this.animationStartTime = null;
+          this.animationDuration = 1000;
+
+          let rightHand = document.getElementById("rightHand");
+          rightHand.addEventListener("triggerdown", () => {
+            console.log("Trigger pressed! Updating graph.");
+            this.startAnimation();
+          });
+        },
+
+        tick: function (time, delta) {
+          if (this.animationStartTime !== null) {
+            let elapsed = time - this.animationStartTime;
+            let t = Math.min(elapsed / this.animationDuration, 1);
+            let interpolatedData = this.data.map((d, i) =>
+              d3.interpolateNumber(d, this.targetData[i])(t)
+            );
+            this.updateCanvas(interpolatedData);
+            if (t >= 1) {
+              this.animationStartTime = null;
+              this.data = [...this.targetData];
+            }
+          }
+          let material = this.el.getObject3D('mesh').material;
+          if (material.map) {
+            material.map.needsUpdate = true;
+          }
+        },
+
+        generateRandomData: function () {
+          return Array.from({ length: 6 }, () => Math.floor(Math.random() * 10) + 1);
+        },
+
+        updateCanvas: function (data) {
+          const ctx = this.ctx;
+          const canvas = this.canvas;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          const xScale = d3.scaleBand()
+            .domain(d3.range(data.length))
+            .range([20, canvas.width - 20])
+            .padding(0.1);
+
+          const yScale = d3.scaleLinear()
+            .domain([0, 10])
+            .range([canvas.height - 20, 20]);
+
+          data.forEach((d, i) => {
+            ctx.fillStyle = d3.interpolateCool(d / 10);
+            ctx.fillRect(
+              xScale(i),
+              yScale(d),
+              xScale.bandwidth(),
+              canvas.height - yScale(d) - 20
+            );
+          });
+        },
+
+        startAnimation: function () {
+          this.targetData = this.generateRandomData();
+          this.animationStartTime = performance.now();
+        }
+      });
+    </script>
+  </body>
+</html>

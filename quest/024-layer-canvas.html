@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame Canvas Layer</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+      <a-assets>
+        <canvas id="canvas" width="256" height="256"></canvas>
+      </a-assets>
+      <a-entity
+        id="canvasLayer"
+        layer="type: quad; src: #canvas; width: 1; height: 1"
+        position="0 1.5 -2"
+      ></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      let angle = 30;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "red";
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(angle);
+      ctx.fillRect(-30, -30, 60, 60);
+    </script>
+  </body>
+</html>

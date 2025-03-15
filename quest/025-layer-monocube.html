@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Simple A-Frame Scene</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+      <a-assets>
+        <img id="cubeTexture" src="https://immersive-web.github.io/webxr-samples/media/textures/mono_cube_map.png" />
+      </a-assets>
+      <a-entity id="cubeLayer" layer="type: monocubemap; src: #cubeTexture;"></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+  </body>
+</html>

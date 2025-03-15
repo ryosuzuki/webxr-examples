@@ -1,0 +1,23 @@
+<!--
+Only works with webxr layer supported browser
+- It should work with Quest 3
+https://immersive-web.github.io/webxr-samples/report/
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>A-Frame WebXR Layer Drawing</title>
+  <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+</head>
+<body>
+  <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+    <a-assets>
+      <img id="image" src="https://pbs.twimg.com/profile_images/1230919359997960192/I8vAOxmy_400x400.jpg">
+    </a-assets>
+    <a-entity id="imageLayer" layer="type: quad; src: #image; width: 1; height: 1" position="0 1.5 -2"></a-entity>
+    <a-camera></a-camera>
+  </a-scene>
+</body>
+</html>

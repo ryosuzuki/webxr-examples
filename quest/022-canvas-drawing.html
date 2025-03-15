@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame Laser Canvas Drawing</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar">
+      <a-assets>
+        <canvas id="myCanvas" width="256" height="256"></canvas>
+      </a-assets>
+      <a-plane
+        id="drawingPlane"
+        position="0 1.5 -2"
+        width="2"
+        height="2"
+        material="src: #myCanvas; transparent: true"
+        canvas-updater
+      >
+      </a-plane>
+      <a-entity
+        id="rightHand"
+        meta-touch-controls="hand: right"
+        laser-controls
+        raycaster="objects: *"
+      ></a-entity>
+      <a-camera></a-camera>
+    </a-scene>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let rightHand = document.getElementById("rightHand");
+        rightHand.setAttribute("laser-draw", "");
+      });
+
+      AFRAME.registerComponent("laser-draw", {
+        init: function () {
+          this.raycaster = this.el.components.raycaster;
+          this.drawingPlane = document.getElementById("drawingPlane");
+          this.isDrawing = false;
+          this.el.addEventListener("triggerdown", () => {
+            this.isDrawing = true;
+          });
+          this.el.addEventListener("triggerup", () => {
+            this.isDrawing = false;
+          });
+        },
+        tick: function () {
+          if (!this.isDrawing || !this.raycaster) return;
+          let intersections = this.raycaster.intersections;
+          if (
+            intersections.length > 0 &&
+            intersections[0].object.el === this.drawingPlane
+          ) {
+            let uv = intersections[0].uv;
+            this.drawingPlane.components["canvas-updater"].drawAt(uv);
+          }
+        },
+      });
+
+      AFRAME.registerComponent("canvas-updater", {
+        init: function () {
+          this.canvas = document.getElementById("myCanvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.ctx.fillStyle = "rgba(128, 128, 128, 0.2)";
+          this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        },
+        updateCanvas: function () {
+          let material = this.el.getObject3D("mesh").material;
+          if (material.map) {
+            material.map.needsUpdate = true;
+          }
+        },
+        drawAt: function (uv) {
+          let ctx = this.ctx;
+          let canvas = this.canvas;
+          let x = uv.x * canvas.width;
+          let y = (1 - uv.y) * canvas.height;
+          ctx.fillStyle = "red";
+          ctx.beginPath();
+          ctx.arc(x, y, 2, 0, Math.PI * 2);
+          ctx.fill();
+          this.updateCanvas();
+        },
+      });
+    </script>
+  </body>
+</html>

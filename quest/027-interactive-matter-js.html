@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>A-Frame + Matter.js + Laser Drag</title>
+    <script src="https://aframe.io/releases/1.7.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.20.0/matter.min.js"></script>
+  </head>
+  <body>
+    <a-scene xr-mode-ui="enabled: true; XRMode: ar" background="transparent: true">
+      <a-assets>
+        <canvas id="canvas" width="256" height="256"></canvas>
+      </a-assets>
+      <a-plane
+        position="0 1.5 -2"
+        material="src: #canvas; transparent: true"
+        canvas-updater
+      ></a-plane>
+      <a-camera></a-camera>
+      <a-entity
+        id="rightController"
+        meta-touch-controls="hand: right"
+        laser-controls
+        raycaster="objects: *"
+      ></a-entity>
+    </a-scene>
+
+    <script>
+      AFRAME.registerComponent("canvas-updater", {
+        init: function () {
+          this.canvas = document.getElementById("canvas");
+          this.ctx = this.canvas.getContext("2d");
+          this.selectedBall = null;
+          this.setupPhysics();
+
+          let controller = document.getElementById("rightController");
+          controller.addEventListener("triggerdown", (event) => {
+            let intersection = controller.components.raycaster.intersections[0];
+            if (intersection) {
+              let uv = intersection.uv;
+              let hitX = uv.x * this.canvas.width;
+              let hitY = (1 - uv.y) * this.canvas.height;
+              this.selectedBall = this.getNearestBall(hitX, hitY);
+            } else {
+              this.setupPhysics();
+            }
+          });
+          controller.addEventListener("triggerup", () => {
+            this.selectedBall = null;
+          });
+        },
+
+        setupPhysics: function () {
+          if (this.engine) {
+            Matter.Engine.clear(this.engine);
+          }
+          this.engine = Matter.Engine.create();
+          this.world = this.engine.world;
+
+          let ground = Matter.Bodies.rectangle(128, 240, 256, 20, {
+            isStatic: true,
+          });
+          Matter.World.add(this.world, ground);
+
+          this.balls = [];
+          for (let i = 0; i < 10; i++) {
+            let ball = Matter.Bodies.circle(
+              Math.random() * 200 + 20,
+              Math.random() * 50 + 20,
+              Math.random() * 10 + 5,
+              { restitution: 0.8 }
+            );
+            this.balls.push(ball);
+            Matter.World.add(this.world, ball);
+          }
+        },
+
+        getNearestBall: function (x, y) {
+          let minDist = Infinity;
+          let nearestBall = null;
+          this.balls.forEach((ball) => {
+            let dist = Math.hypot(ball.position.x - x, ball.position.y - y);
+            if (dist < minDist) {
+              minDist = dist;
+              nearestBall = ball;
+            }
+          });
+          return nearestBall;
+        },
+
+        tick: function (time, delta) {
+          if (!this.lastTime) this.lastTime = time;
+          let deltaTime = (time - this.lastTime) * 0.001;
+          this.lastTime = time;
+
+          Matter.Engine.update(this.engine, deltaTime * 1000);
+
+          if (this.selectedBall) {
+            let controller = document.getElementById("rightController");
+
+            let intersection = controller.components.raycaster.intersections[0];
+            if (intersection && intersection.uv) {
+              let uv = intersection.uv;
+              let newX = uv.x * this.canvas.width;
+              let newY = (1 - uv.y) * this.canvas.height;
+              Matter.Body.setPosition(this.selectedBall, { x: newX, y: newY });
+            }
+          }
+
+          let ctx = this.ctx;
+          let canvas = this.canvas;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          ctx.fillStyle = "blue";
+          this.balls.forEach((ball) => {
+            ctx.beginPath();
+            ctx.arc(
+              ball.position.x,
+              ball.position.y,
+              ball.circleRadius,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+          });
+
+          ctx.fillStyle = "gray";
+          ctx.fillRect(0, 240, 256, 20);
+
+          let material = this.el.getObject3D("mesh").material;
+          if (material.map) {
+            material.map.needsUpdate = true;
+          }
+        },
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quest WebXR Examples</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #172534; background: #f4f6f8; }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    main { max-width: 860px; margin: 0 auto; padding: 48px 20px; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0 0 12px; letter-spacing: -.03em; }
+    p { line-height: 1.6; margin: 12px 0; }
+    a { color: #1459a0; text-underline-offset: 3px; }
+    a:hover { color: #092f58; }
+    a:focus-visible { outline: 3px solid #d07b00; outline-offset: 3px; border-radius: 3px; }
+    .repo { display: inline-block; padding: 12px 0; font-weight: 600; }
+    .note { color: #4b5c6e; font-size: .95rem; }
+    ol { padding: 0; margin: 24px 0; list-style: none; border: 1px solid #d8e0e8; border-radius: 12px; overflow: hidden; background: #fff; }
+    li { display: grid; grid-template-columns: 3rem minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 8px 18px; }
+    li + li { border-top: 1px solid #e4e9ee; }
+    li:hover { background: #f8fafc; }
+    .number { color: #657587; font-variant-numeric: tabular-nums; font-size: .9rem; }
+    .demo { padding: 12px 0; font-weight: 600; }
+    .source { padding: 12px 4px; font-size: .9rem; white-space: nowrap; }
+    @media (max-width: 480px) {
+      main { padding: 28px 12px; }
+      li { grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 8px; padding: 6px 10px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Quest WebXR Examples</h1>
+    <p>30 hands-on examples for Meta Quest. Select an example to open the demo, or choose GitHub to read its source code.</p>
+    <a class="repo" href="https://github.com/ryosuzuki/webxr-examples/tree/main/quest">Browse all examples on GitHub ↗</a>
+    <p class="note">For immersive demos, open this page in Meta Quest Browser and enter AR/VR from the demo. Available features depend on your headset, browser version, and permissions.</p>
+    <ol aria-label="Quest examples">
+      <li>
+        <span class="number">001</span>
+        <a class="demo" href="001-pass-through.html">Passthrough</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/001-pass-through.html" aria-label="GitHub source for Passthrough">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">002</span>
+        <a class="demo" href="002-controller.html">Controllers</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/002-controller.html" aria-label="GitHub source for Controllers">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">003</span>
+        <a class="demo" href="003-hand.html">Hand tracking</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/003-hand.html" aria-label="GitHub source for Hand tracking">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">004</span>
+        <a class="demo" href="004-spawn-cube.html">Spawn a cube</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/004-spawn-cube.html" aria-label="GitHub source for Spawn a cube">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">005</span>
+        <a class="demo" href="005-drag-cube.html">Drag a cube</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/005-drag-cube.html" aria-label="GitHub source for Drag a cube">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">006</span>
+        <a class="demo" href="006-drawing.html">Drawing</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/006-drawing.html" aria-label="GitHub source for Drawing">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">007</span>
+        <a class="demo" href="007-drawing-with-pressure.html">Drawing with pressure</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/007-drawing-with-pressure.html" aria-label="GitHub source for Drawing with pressure">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">008</span>
+        <a class="demo" href="008-spawn-physics.html">Spawn physics objects</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/008-spawn-physics.html" aria-label="GitHub source for Spawn physics objects">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">009</span>
+        <a class="demo" href="009-laser-raycaster.html">Laser raycaster</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/009-laser-raycaster.html" aria-label="GitHub source for Laser raycaster">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">010</span>
+        <a class="demo" href="010-text-input.html">Text input</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/010-text-input.html" aria-label="GitHub source for Text input">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">011</span>
+        <a class="demo" href="011-speech-input.html">Speech input</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/011-speech-input.html" aria-label="GitHub source for Speech input">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">012</span>
+        <a class="demo" href="012-keyboard-input.html">Keyboard input</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/012-keyboard-input.html" aria-label="GitHub source for Keyboard input">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">013</span>
+        <a class="demo" href="013-canvas-animation.html">Canvas animation</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/013-canvas-animation.html" aria-label="GitHub source for Canvas animation">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">014</span>
+        <a class="demo" href="014-canvas-resize.html">Resize a canvas</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/014-canvas-resize.html" aria-label="GitHub source for Resize a canvas">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">015</span>
+        <a class="demo" href="015-video.html">Video</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/015-video.html" aria-label="GitHub source for Video">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">016</span>
+        <a class="demo" href="016-spawn-3d-model.html">Spawn a 3D model</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/016-spawn-3d-model.html" aria-label="GitHub source for Spawn a 3D model">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">017</span>
+        <a class="demo" href="017-drawing-and-fading.html">Drawing and fading</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/017-drawing-and-fading.html" aria-label="GitHub source for Drawing and fading">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">018</span>
+        <a class="demo" href="018-spawn-animation.html">Spawn animation</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/018-spawn-animation.html" aria-label="GitHub source for Spawn animation">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">019</span>
+        <a class="demo" href="019-real-world-mesh.html">Real-world mesh</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/019-real-world-mesh.html" aria-label="GitHub source for Real-world mesh">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">020</span>
+        <a class="demo" href="020-real-world-physics.html">Real-world physics</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/020-real-world-physics.html" aria-label="GitHub source for Real-world physics">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">021</span>
+        <a class="demo" href="021-color-picker.html">Color picker</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/021-color-picker.html" aria-label="GitHub source for Color picker">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">022</span>
+        <a class="demo" href="022-canvas-drawing.html">Canvas drawing</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/022-canvas-drawing.html" aria-label="GitHub source for Canvas drawing">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">023</span>
+        <a class="demo" href="023-layer-image.html">Image layer</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/023-layer-image.html" aria-label="GitHub source for Image layer">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">024</span>
+        <a class="demo" href="024-layer-canvas.html">Canvas layer</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/024-layer-canvas.html" aria-label="GitHub source for Canvas layer">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">025</span>
+        <a class="demo" href="025-layer-monocube.html">Monocube layer</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/025-layer-monocube.html" aria-label="GitHub source for Monocube layer">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">026</span>
+        <a class="demo" href="026-matter-js.html">Matter.js</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/026-matter-js.html" aria-label="GitHub source for Matter.js">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">027</span>
+        <a class="demo" href="027-matter-js-interactive.html">Interactive Matter.js</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/027-matter-js-interactive.html" aria-label="GitHub source for Interactive Matter.js">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">028</span>
+        <a class="demo" href="028-d3-js.html">D3.js</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/028-d3-js.html" aria-label="GitHub source for D3.js">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">029</span>
+        <a class="demo" href="029-d3-js-animation.html">D3.js animation</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/029-d3-js-animation.html" aria-label="GitHub source for D3.js animation">GitHub ↗</a>
+      </li>
+      <li>
+        <span class="number">030</span>
+        <a class="demo" href="030-d3-js-interactive.html">Interactive D3.js</a>
+        <a class="source" href="https://github.com/ryosuzuki/webxr-examples/blob/main/quest/030-d3-js-interactive.html" aria-label="GitHub source for Interactive D3.js">GitHub ↗</a>
+      </li>
+    </ol>
+  </main>
+</body>
+</html>
